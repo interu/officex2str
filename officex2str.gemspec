@@ -3,9 +3,9 @@ require File.expand_path('../lib/officex2str/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ["interu"]
-  gem.email         = ["beautybeast07@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.email         = ["interu@sonicgarden.jp"]
+  gem.description   = %q{convert office 2010 files to str}
+  gem.summary       = %q{convert office 2010 files(docx,xlsx,pptx) to str}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
@@ -14,4 +14,9 @@ Gem::Specification.new do |gem|
   gem.name          = "officex2str"
   gem.require_paths = ["lib"]
   gem.version       = Officex2str::VERSION
+
+  gem.add_development_dependency "rake", ["= 0.9.2"]
+  gem.add_development_dependency "nokogiri", [">= 1.4.7"]
+  gem.add_development_dependency "zipruby", ["= 0.3.6"]
+
 end
