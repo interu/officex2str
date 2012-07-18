@@ -3,7 +3,12 @@ require 'zipruby'
 require 'mime/types'
 
 class Officex2str
-  attr_accessor :path
+  DOCX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  XLSX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  PPTX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+  VALID_CONTENT_TYPE = [DOCX_CONTENT_TYPE, XLSX_CONTENT_TYPE, PPTX_CONTENT_TYPE].freeze
+
+  attr_accessor :path, :content_type
 
   def self.convert(file_path)
     self.new(file_path).convert
@@ -11,26 +16,35 @@ class Officex2str
 
   def initialize(file_path)
     @path = file_path
+    @content_type = MIME::Types.type_for(path).first.content_type
   end
 
   def convert
-     archives   = Zip::Archive.open(path) { |archive| archive.map(&:name) }
-     pages      = pickup_pages(archives)
-     xmls       = extract_xmls(pages)
-     xml_to_str(xmls)
+    if valid_file?
+      archives   = Zip::Archive.open(path) { |archive| archive.map(&:name) }
+      pages      = pickup_pages(archives)
+      xmls       = extract_xmls(pages)
+      xml_to_str(xmls)
+    else
+      raise InvaildFileTypeError, "Not recognized file type"
+    end
   end
 
 private
+  def valid_file?
+    !!VALID_CONTENT_TYPE.include?(content_type)
+  end
+
   def pickup_pages archives
-    case content_type = MIME::Types.type_for(path).first.content_type
-    when "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    case content_type
+    when DOCX_CONTENT_TYPE
       archives.select{|a| /^word\/document/ =~ a}
-    when "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    when XLSX_CONTENT_TYPE
       archives.select{|a| /^xl\/worksheets\/sheet/ =~ a or /^xl\/sharedStrings/ =~ a or /^xl\/comments/ =~ a }
-    when "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    when PPTX_CONTENT_TYPE
       archives.select{|a| /^ppt\/slides\/slide/ =~ a}
     else
-      nil
+      raise InvalidContentTypeError, "Not recognized content type"
     end
   end
 

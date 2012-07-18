@@ -2,31 +2,48 @@
 require 'spec_helper'
 
 describe Officex2str do
+  context "#valid_file?" do
+    subject do
+      Officex2str.new(@file_path).send(:valid_file?)
+    end
+    context "extname is docx" do
+      before { @file_path = "fixtures/sample.docx" }
+      it { subject.should be_true }
+    end
+    context "extname is xlsx" do
+      before { @file_path = "fixtures/sample.xlsx" }
+      it { subject.should be_true }
+    end
+    context "extname is pptx" do
+      before { @file_path = "fixtures/sample.pptx" }
+      it { subject.should be_true }
+    end
+    context "extname is txt" do
+      before { @file_path = "fixtures/sample.txt" }
+      it { subject.should be_false }
+    end
+  end
+
   context "#pickup_pages" do
     subject do
       archives = Zip::Archive.open(@file_path) { |archive| archive.map(&:name) }
       Officex2str.new(@file_path).send(:pickup_pages, archives).sort
     end
     context "extname is docx" do
-      before do
-        @file_path = "fixtures/sample.docx"
-      end
+      before { @file_path = "fixtures/sample.docx" }
       it { subject.should == ["word/document.xml"] }
     end
 
     context "extname is xlsx" do
-      before do
-        @file_path = "fixtures/sample.xlsx"
-      end
+      before { @file_path = "fixtures/sample.xlsx" }
       it { subject.should == ["xl/comments1.xml", "xl/sharedStrings.xml", "xl/worksheets/sheet1.xml", "xl/worksheets/sheet2.xml"] }
     end
 
     context "extname is pptx" do
-      before do
-        @file_path = "fixtures/sample.pptx"
-      end
+      before { @file_path = "fixtures/sample.pptx" }
       it { subject.should == ["ppt/slides/slide1.xml", "ppt/slides/slide2.xml"] }
     end
+
   end
 
   context "#convert" do
@@ -34,9 +51,7 @@ describe Officex2str do
       Officex2str.convert(@file_path)
     end
     context "extname is xlsx" do
-      before do
-        @file_path = "fixtures/sample.xlsx"
-      end
+      before { @file_path = "fixtures/sample.xlsx" }
       it do
         subject.should include("複数シート対応")
         subject.should include("ソニックガーデン")
@@ -49,9 +64,7 @@ describe Officex2str do
     end
 
     context "extname is docx" do
-      before do
-        @file_path = "fixtures/sample.docx"
-      end
+      before { @file_path = "fixtures/sample.docx" }
       it do
         subject.should include("複数ページ対応")
         subject.should include("ソニックガーデン")
@@ -62,9 +75,7 @@ describe Officex2str do
     end
 
     context "extname is pptx" do
-      before do
-        @file_path = "fixtures/sample.pptx"
-      end
+      before { @file_path = "fixtures/sample.pptx" }
       it do
         subject.should include("Aタイトル")
         subject.should include("Aサブタイトル")
@@ -75,6 +86,6 @@ describe Officex2str do
         subject.should_not include("sheet")
       end
     end
-
   end
+
 end
