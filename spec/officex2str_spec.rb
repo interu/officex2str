@@ -5,7 +5,7 @@ describe Officex2str do
   context "#pickup_pages" do
     subject do
       archives = Zip::Archive.open(@file_path) { |archive| archive.map(&:name) }
-      Officex2str.send(:pickup_pages, File.extname(@file_path), archives).sort
+      Officex2str.send(:pickup_pages, @file_path, archives).sort
     end
     context "extname is docx" do
       before do
@@ -32,8 +32,7 @@ describe Officex2str do
   context "#convert" do
     subject do
       archives = Zip::Archive.open(@file_path) { |archive| archive.map(&:name) }
-      #pages = Officex2str.pickup_pages(File.extname(@file_path), archives)
-      pages = Officex2str.send(:pickup_pages, File.extname(@file_path), archives)
+      pages = Officex2str.send(:pickup_pages, @file_path, archives)
       xmls = Officex2str.send(:extract_xmls, @file_path, pages)
       Officex2str.convert(@file_path)
     end
