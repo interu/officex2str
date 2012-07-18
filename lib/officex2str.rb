@@ -16,7 +16,7 @@ private
     when ".docx"
       archives.select{|a| /^word\/document/ =~ a}
     when ".xlsx"
-      archives.select{|a| /^xl\/worksheets\/sheet/ =~ a or /^xl\/sharedStrings/ =~ a}
+      archives.select{|a| /^xl\/worksheets\/sheet/ =~ a or /^xl\/sharedStrings/ =~ a or /^xl\/comments/ =~ a }
     when ".pptx"
       archives.select{|a| /^ppt\/slides\/slide/ =~ a}
     else
