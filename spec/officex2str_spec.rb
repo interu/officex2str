@@ -5,7 +5,7 @@ describe Officex2str do
   context "#pickup_pages" do
     subject do
       archives = Zip::Archive.open(@file_path) { |archive| archive.map(&:name) }
-      Officex2str.send(:pickup_pages, @file_path, archives).sort
+      Officex2str.new(@file_path).send(:pickup_pages, archives).sort
     end
     context "extname is docx" do
       before do
