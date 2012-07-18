@@ -1,6 +1,6 @@
 # Officex2str
 
-Convert office 2010 files to string.
+Convert Microsoft office 2007/2010 files(docx/xlsx/pptx) to string.
 
 ## Installation
 
@@ -18,5 +18,5 @@ Or install it yourself as:
 
 ## Usage
 
-   Officex2str.convert("file_path")
+    Officex2str.convert("file_path")
 
