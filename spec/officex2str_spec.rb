@@ -86,6 +86,14 @@ describe Officex2str do
         subject.should_not include("sheet")
       end
     end
-  end
 
+    context "extname is txt" do
+      before { @file_path = "fixtures/sample.txt" }
+      it do
+        lambda {
+          Officex2str.convert("fixtures/sample.txt")
+        }.should raise_error(Officex2str::InvalidFileTypeError, "Not recognized file type")
+      end
+    end
+  end
 end

@@ -20,3 +20,6 @@ Or install it yourself as:
 
     Officex2str.convert("file_path")
 
+## Rspec
+
+    $ bundle exec rake

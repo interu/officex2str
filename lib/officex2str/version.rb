@@ -1,3 +1,3 @@
-module Officex2str
+class Officex2str
   VERSION = "0.0.4"
 end

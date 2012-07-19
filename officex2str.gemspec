@@ -16,6 +16,7 @@ Gem::Specification.new do |gem|
   gem.version       = Officex2str::VERSION
 
   gem.add_development_dependency "rake", ["= 0.9.2"]
+  gem.add_development_dependency "rspec", ["= 2.10.0"]
   gem.add_runtime_dependency "nokogiri", [">= 1.4.7"]
   gem.add_runtime_dependency "zipruby", ["= 0.3.6"]
   gem.add_runtime_dependency "mime-types", [">= 1.17.2"]

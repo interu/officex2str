@@ -3,6 +3,8 @@ require 'zipruby'
 require 'mime/types'
 
 class Officex2str
+  class InvalidFileTypeError < Exception; end
+
   DOCX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   XLSX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   PPTX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
@@ -26,7 +28,7 @@ class Officex2str
       xmls       = extract_xmls(pages)
       xml_to_str(xmls)
     else
-      raise InvaildFileTypeError, "Not recognized file type"
+      raise InvalidFileTypeError, "Not recognized file type"
     end
   end
 
@@ -50,7 +52,7 @@ private
 
   def extract_xmls pages
     xml_text = []
-    Zip::Archive.open(path) { |archive| pages.each{ |page| archive.fopen(page) do |f| xml_text << f.read end; } }
+    Zip::Archive.open(path) { |archive| pages.each{ |page| archive.fopen(page) { |f| xml_text << f.read } } }
     xml_text
   end
 
