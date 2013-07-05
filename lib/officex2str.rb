@@ -56,9 +56,18 @@ private
     xml_text
   end
 
-  def xml_to_str xml_text
+  def xml_to_str xmls
     text = ""
-    xml_text.each{|xml_t| text << Nokogiri.XML(xml_t.toutf8, nil, 'utf8').to_str } unless xml_text.empty?
+    unless xmls.empty?
+      if content_type == XLSX_CONTENT_TYPE
+        xmls.map do |xml|
+          doc = Nokogiri.XML(xml.toutf8)
+          text += doc.search("t").map{|node| node.children.to_s}.join(' ')
+        end
+      else
+        xmls.each{|xml| text << Nokogiri.XML(xml.toutf8, nil, 'utf8').to_str }
+      end
+    end
     text
   end
 end

@@ -58,6 +58,8 @@ describe Officex2str do
         subject.should include("ＳＯＮＩＣＧＡＲＤＥＮ")
         subject.should include("株式会社")
         subject.should include("コメント")
+        subject.should include("STG001")
+        subject.should include("STG003")
         subject.should_not include("sonicgarden")
         subject.should_not include("sheet")
       end
