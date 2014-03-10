@@ -23,3 +23,5 @@ Or install it yourself as:
 ## Rspec
 
     $ bundle exec rake
+
+## Push rubygems.org
