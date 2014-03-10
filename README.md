@@ -25,3 +25,5 @@ Or install it yourself as:
     $ bundle exec rake
 
 ## Push rubygems.org
+    $ bundle exec rake build
+    $ bundle exec rake release
