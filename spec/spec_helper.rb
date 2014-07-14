@@ -5,7 +5,7 @@ require 'officex2str'
 require "rspec"
 require "rspec/core"
 require 'nokogiri'
-require 'zipruby'
+require 'zip'
 require 'kconv'
 
 # Requires supporting files with custom matchers and macros, etc,

@@ -24,10 +24,9 @@ describe Officex2str do
     end
   end
 
-  context "#pickup_pages" do
+  context "#select_target_entries" do
     subject do
-      archives = Zip::Archive.open(@file_path) { |archive| archive.map(&:name) }
-      Officex2str.new(@file_path).send(:pickup_pages, archives).sort
+      Officex2str.new(@file_path).send(:select_target_entries).map{|entry| entry.to_s}.sort
     end
     context "extname is docx" do
       before { @file_path = "fixtures/sample.docx" }
@@ -43,7 +42,6 @@ describe Officex2str do
       before { @file_path = "fixtures/sample.pptx" }
       it { subject.should == ["ppt/slides/slide1.xml", "ppt/slides/slide2.xml"] }
     end
-
   end
 
   context "#convert" do
@@ -54,7 +52,7 @@ describe Officex2str do
       before { @file_path = "fixtures/sample.xlsx" }
       it do
         subject.should include("複数シート対応")
-        subject.should include("ソニックガーデン")
+        subject.should include("ｿﾆｯｸｶﾞｰﾃﾞﾝ")
         subject.should include("ＳＯＮＩＣＧＡＲＤＥＮ")
         subject.should include("株式会社")
         subject.should include("コメント")

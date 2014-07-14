@@ -1,6 +1,6 @@
 require 'nokogiri'
-require 'zipruby'
 require 'mime/types'
+require 'zip'
 
 class Officex2str
   class InvalidFileTypeError < Exception; end
@@ -10,7 +10,7 @@ class Officex2str
   PPTX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
   VALID_CONTENT_TYPE = [DOCX_CONTENT_TYPE, XLSX_CONTENT_TYPE, PPTX_CONTENT_TYPE].freeze
 
-  attr_accessor :path, :content_type
+  attr_accessor :path, :content_type, :entries, :xmls
 
   def self.convert(file_path)
     self.new(file_path).convert
@@ -19,14 +19,14 @@ class Officex2str
   def initialize(file_path)
     @path = file_path
     @content_type = MIME::Types.type_for(path).first.content_type
+    @entries = valid_file? ? Zip::File.open(path).entries : []
+    @xmls = []
   end
 
   def convert
     if valid_file?
-      archives   = Zip::Archive.open(path) { |archive| archive.map(&:name) }
-      pages      = pickup_pages(archives)
-      xmls       = extract_xmls(pages)
-      xml_to_str(xmls)
+      extract_xmls
+      xml_to_str
     else
       raise InvalidFileTypeError, "Not recognized file type"
     end
@@ -37,37 +37,25 @@ private
     !!VALID_CONTENT_TYPE.include?(content_type)
   end
 
-  def pickup_pages archives
+  def select_target_entries
     case content_type
     when DOCX_CONTENT_TYPE
-      archives.select{|a| /^word\/document/ =~ a}
+      entries.select{|a| /^word\/document/ =~ a.to_s}
     when XLSX_CONTENT_TYPE
-      archives.select{|a| /^xl\/worksheets\/sheet/ =~ a or /^xl\/sharedStrings/ =~ a or /^xl\/comments/ =~ a }
+      entries.select{|a| /^xl\/worksheets\/sheet/ =~ a.to_s or /^xl\/sharedStrings/ =~ a.to_s or /^xl\/comments/ =~ a.to_s }
     when PPTX_CONTENT_TYPE
-      archives.select{|a| /^ppt\/slides\/slide/ =~ a}
+      entries.select{|a| /^ppt\/slides\/slide/ =~ a.to_s}
     else
       raise InvalidContentTypeError, "Not recognized content type"
     end
   end
 
-  def extract_xmls pages
-    xml_text = []
-    Zip::Archive.open(path) { |archive| pages.each{ |page| archive.fopen(page) { |f| xml_text << f.read } } }
-    xml_text
+  def extract_xmls
+    select_target_entries.map{|entry| xmls << entry.get_input_stream.read }
   end
 
-  def xml_to_str xmls
-    text = ""
-    unless xmls.empty?
-      if content_type == XLSX_CONTENT_TYPE
-        xmls.map do |xml|
-          doc = Nokogiri.XML(xml.toutf8)
-          text += doc.search("t").map{|node| node.children.to_s}.join(' ')
-        end
-      else
-        xmls.each{|xml| text << Nokogiri.XML(xml.toutf8, nil, 'utf8').to_str }
-      end
-    end
-    text
+  def xml_to_str
+    return '' if xmls.empty?
+    xmls.inject(""){|result, xml| result << Nokogiri.XML(xml, nil, 'utf8').to_str }
   end
 end
