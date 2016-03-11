@@ -60,6 +60,10 @@ describe Officex2str do
         subject.should include("STG003")
         subject.should_not include("sonicgarden")
         subject.should_not include("sheet")
+        # フリガナの自動保存分除去確認
+        subject.should_not include('カブシキガイシャ')
+        subject.should_not include('フクスウタイオウ')
+        subject.should_not include('カイシャ')
       end
     end
 

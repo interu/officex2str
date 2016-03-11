@@ -25,8 +25,14 @@ class Officex2str
 
   def convert
     if valid_file?
-      extract_xmls
-      xml_to_str
+      text = []
+      select_target_entries.each do |entry|
+        doc = Nokogiri.XML(entry.get_input_stream.read, nil, 'utf8')
+        # XLSXではrPhタグに漢字のフリガナが自動的に挿入されるため除外
+        doc.css('rPh').remove
+        text << doc.to_str
+      end
+      text.join(' ')
     else
       raise InvalidFileTypeError, "Not recognized file type"
     end
@@ -50,12 +56,4 @@ private
     end
   end
 
-  def extract_xmls
-    select_target_entries.map{|entry| xmls << entry.get_input_stream.read }
-  end
-
-  def xml_to_str
-    return '' if xmls.empty?
-    xmls.inject(""){|result, xml| result << Nokogiri.XML(xml, nil, 'utf8').to_str }
-  end
 end
